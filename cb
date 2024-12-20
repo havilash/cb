@@ -21,7 +21,7 @@ Options:
 EOF
 }
 
-_show_version() {
+_version() {
     echo "cb version $VERSION"
 }
 
@@ -49,7 +49,7 @@ _update() {
     fi
 }
 
-_copy_to_clipboard() {
+_cb_copy() {
     if command -v xclip &>/dev/null; then
         if [[ $APPEND == "true" ]]; then
             { _paste_from_clipboard; cat; } | xclip -selection clipboard -i
@@ -74,7 +74,7 @@ _copy_to_clipboard() {
     fi
 }
 
-_paste_from_clipboard() {
+_cb_paste() {
     if command -v xclip &>/dev/null; then
         xclip -selection clipboard -o
     elif command -v xsel &>/dev/null; then
@@ -90,7 +90,7 @@ _paste_from_clipboard() {
 main() {
     if [[ $# -eq 0 ]] && [[ ! -p /dev/stdin ]]; then
         # No arguments and no input pipe
-        _paste_from_clipboard
+        _cb_paste
         exit 0
     fi
 
@@ -99,7 +99,7 @@ main() {
             -h|--help) _usage; exit 0 ;;
             -a|--append) APPEND="true"; shift ;;
             -i|--ignore-interrupts) trap '' SIGINT; shift ;;
-            -v|--version) _show_version; exit 0 ;;
+            -v|--version) _version; exit 0 ;;
             -U|--update) _update; exit 0 ;;
             *) echo "Error: Unknown option '$1'"; _usage; exit 1 ;;
         esac
@@ -107,9 +107,9 @@ main() {
 
     # Process input
     if [[ -p /dev/stdin ]]; then
-        _copy_to_clipboard
+        _cb_copy
     else
-        _paste_from_clipboard
+        _cb_paste
     fi
 }
 
