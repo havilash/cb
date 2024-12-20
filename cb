@@ -25,7 +25,7 @@ _show_version() {
 }
 
 _update() {
-    local script_url="https://raw.githubusercontent.com/javier-lopez/learn/master/sh/tools/cb"
+    local script_url="https://raw.githubusercontent.com/havilash/cb/refs/heads/main/cb"
     local tmp_file="/tmp/cb.$$.update"
     local current_file="$(realpath "$0")"
 
@@ -99,6 +99,7 @@ main() {
             -a|--append) APPEND="true"; shift ;;
             -i|--ignore-interrupts) trap '' SIGINT; shift ;;
             -v|--version) _show_version; exit 0 ;;
+            -U|--update) _update; exit 0 ;;
             *) echo "Error: Unknown option '$1'"; _usage; exit 1 ;;
         esac
     done
