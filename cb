@@ -1,0 +1,114 @@
+#!/bin/bash
+
+# Description: Unify copy and paste commands into one intelligent chainable command
+# https://gist.github.com/RichardBronosky/56d8f614fab2bacdd8b048fb58d0c0c7
+
+VERSION="2024.12.20"
+
+_usage() {
+    cat <<EOF
+Usage: cb [OPTIONS]
+
+Unify the copy and paste commands into one intelligent chainable command.
+
+Options:
+  -a, --append              Append to the clipboard instead of overwriting.
+  -i, --ignore-interrupts   Ignore interrupt signals.
+  -U, --update              Update this program to the latest version.
+  -v, --version             Show the version of this program.
+  -h, --help                Show this help message and exit.
+EOF
+}
+
+_show_version() {
+    echo "cb version $VERSION"
+}
+
+_update() {
+    local script_url="https://raw.githubusercontent.com/javier-lopez/learn/master/sh/tools/cb"
+    local tmp_file="/tmp/cb.$$.update"
+    local current_file="$(realpath "$0")"
+
+    echo "Checking for updates..."
+    if command -v curl &>/dev/null; then
+        curl -s "$script_url" -o "$tmp_file"
+    elif command -v wget &>/dev/null; then
+        wget -q "$script_url" -O "$tmp_file"
+    else
+        echo "Error: 'curl' or 'wget' is required to update." >&2
+        exit 1
+    fi
+
+    if [[ -s $tmp_file ]]; then
+        mv "$tmp_file" "$current_file"
+        chmod +x "$current_file"
+        echo "cb updated successfully."
+    else
+        echo "Error: Failed to fetch update." >&2
+    fi
+}
+
+_copy_to_clipboard() {
+    if command -v xclip &>/dev/null; then
+        if [[ $APPEND == "true" ]]; then
+            { _paste_from_clipboard; cat; } | xclip -selection clipboard -i
+        else
+            cat | xclip -selection clipboard -i
+        fi
+    elif command -v xsel &>/dev/null; then
+        if [[ $APPEND == "true" ]]; then
+            { _paste_from_clipboard; cat; } | xsel --clipboard
+        else
+            cat | xsel --clipboard
+        fi
+    elif command -v pbcopy &>/dev/null; then
+        if [[ $APPEND == "true" ]]; then
+            { _paste_from_clipboard; cat; } | pbcopy
+        else
+            cat | pbcopy
+        fi
+    else
+        echo "Error: No clipboard utility found (xclip, xsel, or pbcopy required)." >&2
+        exit 1
+    fi
+}
+
+_paste_from_clipboard() {
+    if command -v xclip &>/dev/null; then
+        xclip -selection clipboard -o
+    elif command -v xsel &>/dev/null; then
+        xsel --clipboard
+    elif command -v pbpaste &>/dev/null; then
+        pbpaste
+    else
+        echo "Error: No clipboard utility found (xclip, xsel, or pbpaste required)." >&2
+        exit 1
+    fi
+}
+
+main() {
+    if [[ $# -eq 0 ]] && [[ ! -p /dev/stdin ]]; then
+        # No arguments and no input pipe
+        _paste_from_clipboard
+        exit 0
+    fi
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -h|--help) _usage; exit 0 ;;
+            -a|--append) APPEND="true"; shift ;;
+            -i|--ignore-interrupts) trap '' SIGINT; shift ;;
+            -v|--version) _show_version; exit 0 ;;
+            *) echo "Error: Unknown option '$1'"; _usage; exit 1 ;;
+        esac
+    done
+
+    # Process input
+    if [[ -p /dev/stdin ]]; then
+        _copy_to_clipboard
+    else
+        _paste_from_clipboard
+    fi
+}
+
+main "$@"
