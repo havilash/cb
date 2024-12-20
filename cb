@@ -2,8 +2,9 @@
 
 # Description: Unify copy and paste commands into one intelligent chainable command
 # https://gist.github.com/RichardBronosky/56d8f614fab2bacdd8b048fb58d0c0c7
+# based on https://github.com/javier-lopez/learn/blob/master/sh/tools/cb
 
-VERSION="2024.12.20"
+VERSION="1.0.0"
 
 _usage() {
     cat <<EOF
