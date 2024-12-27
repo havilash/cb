@@ -7,8 +7,7 @@
 VERSION="1.0.0"
 
 _usage() {
-    cat <<EOF
-Usage: cb [OPTIONS]
+    echo "Usage: cb [OPTIONS]
 
 Unify the copy and paste commands into one intelligent chainable command.
 
@@ -17,8 +16,7 @@ Options:
   -i, --ignore-interrupts   Ignore interrupt signals.
   -U, --update              Update this program to the latest version.
   -v, --version             Show the version of this program.
-  -h, --help                Show this help message and exit.
-EOF
+  -h, --help                Show this help message and exit."
 }
 
 _version() {
