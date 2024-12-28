@@ -23,30 +23,6 @@ _version() {
     echo "cb version $VERSION"
 }
 
-_update() {
-    local script_url="https://raw.githubusercontent.com/havilash/cb/refs/heads/main/cb"
-    local tmp_file="/tmp/cb.$$.update"
-    local current_file="$(realpath "$0")"
-
-    echo "Checking for updates..."
-    if command -v curl &>/dev/null; then
-        curl -s "$script_url" -o "$tmp_file"
-    elif command -v wget &>/dev/null; then
-        wget -q "$script_url" -O "$tmp_file"
-    else
-        echo "Error: 'curl' or 'wget' is required to update." >&2
-        exit 1
-    fi
-
-    if [[ -s $tmp_file ]]; then
-        mv "$tmp_file" "$current_file"
-        chmod +x "$current_file"
-        echo "cb updated successfully."
-    else
-        echo "Error: Failed to fetch update." >&2
-    fi
-}
-
 _cb_copy() {
     if command -v xclip &>/dev/null; then
         if [[ $APPEND == "true" ]]; then
@@ -98,7 +74,6 @@ main() {
             -a|--append) APPEND="true"; shift ;;
             -i|--ignore-interrupts) trap '' SIGINT; shift ;;
             -v|--version) _version; exit 0 ;;
-            -U|--update) _update; exit 0 ;;
             *) echo "Error: Unknown option '$1'"; _usage; exit 1 ;;
         esac
     done
