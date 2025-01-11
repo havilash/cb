@@ -1,3 +1,6 @@
-SOURCE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)
+CB_PATH=$(
+    cd "$(dirname "${BASH_SOURCE[0]}")"
+    pwd -P
+)
 
-alias cb="$SOURCE_PATH/cb.sh"
+alias cb="$CB_PATH/cb.sh"
