@@ -42,8 +42,14 @@ _cb_copy() {
         else
             cat | pbcopy
         fi
+    elif command -v wl-copy &>/dev/null; then
+        if [[ $APPEND == "true" ]]; then
+            { _paste_from_clipboard; cat; } | wl-copy
+        else
+            cat | wl-copy
+        fi
     else
-        echo "Error: No clipboard utility found (xclip, xsel, or pbcopy required)." >&2
+        echo "Error: No clipboard utility found (xclip, xsel, pbcopy or wl-clipboard required)." >&2
         exit 1
     fi
 }
@@ -55,8 +61,10 @@ _cb_paste() {
         xsel --clipboard
     elif command -v pbpaste &>/dev/null; then
         pbpaste
+    elif command -v wl-paste &>/dev/null; then
+        wl-paste
     else
-        echo "Error: No clipboard utility found (xclip, xsel, or pbpaste required)." >&2
+        echo "Error: No clipboard utility found (xclip, xsel, pbpaste or wl-clipboard required)." >&2
         exit 1
     fi
 }
